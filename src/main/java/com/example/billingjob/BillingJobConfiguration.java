@@ -15,6 +15,7 @@ public class BillingJobConfiguration {
     @Bean
     public Job job(JobRepository jobRepository, Step step1) {
         return new JobBuilder("BillingJob", jobRepository)
+                .validator(billingJobParametersValidator())
                 .start(step1)
                 .build();
     }
@@ -24,6 +25,11 @@ public class BillingJobConfiguration {
         return new StepBuilder("filePreparation", JobRepository)
                 .tasklet(new FilePreparationTasklet(), transcationManager)
                 .build();
+    }
+
+    @Bean 
+    public BillingJobParametersValidator billingJobParametersValidator() {
+        return new BillingJobParametersValidator();
     }
 }
 
