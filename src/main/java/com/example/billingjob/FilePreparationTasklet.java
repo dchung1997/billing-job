@@ -17,7 +17,8 @@ public class FilePreparationTasklet implements Tasklet {
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
         JobParameters jobParameters = contribution.getStepExecution().getJobParameters();
         String inputFile = jobParameters.getString("input.file");
-        
+        System.out.println("Input file detected: " + inputFile);
+
         Path source = Paths.get(inputFile);
         Path target = Paths.get("staging", source.toFile().getName());
 
