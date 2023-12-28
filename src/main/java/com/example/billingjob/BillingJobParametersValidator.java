@@ -24,12 +24,12 @@ public class BillingJobParametersValidator implements JobParametersValidator {
             throw new JobParametersInvalidException("Output File is missing or is incorrectly formatted. Requires string.");
         }
 
-        if (yearParameter == null || !(yearParameter.getValue() instanceof Integer)) {
-            throw new JobParametersInvalidException("Year is missing or is incorrectly formatted. Requires Integer.");
+        if (yearParameter == null) {
+            throw new JobParametersInvalidException("data.year is missing.");
         }
 
-        if (monthParameter == null || !(monthParameter.getValue() instanceof Integer)) {
-            throw new JobParametersInvalidException("Month is missing or is incorrectly formatted. Requires Integer.");
+        if (monthParameter == null) {
+            throw new JobParametersInvalidException("data.month is missing.");
         }        
     }
     
