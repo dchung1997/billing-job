@@ -77,14 +77,32 @@ class BillingJobApplicationTests {
 		Throwable exception = Assertions.assertThrows(JobParametersInvalidException.class, () -> this.jobLauncherTestUtils.launchJob(jobParameters));
 		
 		// Then
-		Assertions.assertEquals("Input File is missing.", exception.getMessage());
+		Assertions.assertEquals("Input File is missing or is incorrectly formatted. Requires string.", exception.getMessage());
 
 	}
+
+	@Test
+	void testMalformatedInputFile() throws Exception {
+		JobParameters jobParameters = new JobParametersBuilder()
+										.addJobParameter("input.file", 1, Integer.class)
+										.addString("output.file", "staging/billing-report-2023-01.csv")
+										.addJobParameter("data.year", 2023, Integer.class)
+										.addJobParameter("data.month", 1, Integer.class)										
+										.toJobParameters();			
+
+		// When		
+		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> this.jobLauncherTestUtils.launchJob(jobParameters));
+		
+		// Then
+		Assertions.assertEquals("Key input.file is not of type String", exception.getMessage());										
+	}
+
 
 	@Test 
 	void testEmptyOutputFile() throws Exception {
 		// Given
 		JobParameters jobParameters = new JobParametersBuilder()
+										.addString("output.file", "")
 										.addString("input.file", "input/billing-2023-01.csv")
 										.addJobParameter("data.year", 2023, Integer.class)
 										.addJobParameter("data.month", 1, Integer.class)											
@@ -94,9 +112,10 @@ class BillingJobApplicationTests {
 		Throwable exception = Assertions.assertThrows(JobParametersInvalidException.class, () -> this.jobLauncherTestUtils.launchJob(jobParameters));
 		
 		// Then
-		Assertions.assertEquals("Output File is missing.", exception.getMessage());
+		Assertions.assertEquals("Output File is missing or is incorrectly formatted. Requires string.", exception.getMessage());
 
 	}
+	
 
 	@Test 
 	void testEmptyDataYear() throws Exception {
@@ -111,8 +130,24 @@ class BillingJobApplicationTests {
 		Throwable exception = Assertions.assertThrows(JobParametersInvalidException.class, () -> this.jobLauncherTestUtils.launchJob(jobParameters));
 		
 		// Then
-		Assertions.assertEquals("Year is missing.", exception.getMessage());
+		Assertions.assertEquals("Year is missing or is incorrectly formatted. Requires Integer.", exception.getMessage());
 
+	}		
+
+	@Test
+	void testMalformatedDataYear() throws Exception {
+		JobParameters jobParameters = new JobParametersBuilder()
+										.addString("input.file", "input/billing-2023-01.csv")
+										.addString("output.file", "staging/billing-report-2023-01.csv")
+										.addJobParameter("data.year", "hello", String.class)
+										.addJobParameter("data.month", 1, Integer.class)										
+										.toJobParameters();			
+
+		// When		
+		Throwable exception = Assertions.assertThrows(JobParametersInvalidException.class, () -> this.jobLauncherTestUtils.launchJob(jobParameters));
+		
+		// Then
+		Assertions.assertEquals("Year is missing or is incorrectly formatted. Requires Integer.", exception.getMessage());										
 	}	
 
 	@Test 
@@ -121,14 +156,14 @@ class BillingJobApplicationTests {
 		JobParameters jobParameters = new JobParametersBuilder()
 										.addString("input.file", "input/billing-2023-01.csv")
 										.addString("output.file", "staging/billing-report-2023-01.csv")
-										.addJobParameter("data.year", 12, Integer.class)											
+										.addJobParameter("data.year", 12, Integer.class)	
 										.toJobParameters();
 
 		// When		
 		Throwable exception = Assertions.assertThrows(JobParametersInvalidException.class, () -> this.jobLauncherTestUtils.launchJob(jobParameters));
 		
 		// Then
-		Assertions.assertEquals("Month is missing.", exception.getMessage());
+		Assertions.assertEquals("Month is missing or is incorrectly formatted. Requires Integer.", exception.getMessage());
 
 	}		
 

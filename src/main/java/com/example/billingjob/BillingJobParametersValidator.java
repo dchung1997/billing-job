@@ -17,19 +17,19 @@ public class BillingJobParametersValidator implements JobParametersValidator {
         JobParameter<?> monthParameter = parameters.getParameter("data.month");  
 
         if (!StringUtils.hasText(inputFile)) {
-            throw new JobParametersInvalidException("Input File is missing.");
+            throw new JobParametersInvalidException("Input File is missing or is incorrectly formatted. Requires string.");
         } 
 
         if (!StringUtils.hasText(outputFile)) {
-            throw new JobParametersInvalidException("Output File is missing.");
+            throw new JobParametersInvalidException("Output File is missing or is incorrectly formatted. Requires string.");
         }
 
         if (yearParameter == null || !(yearParameter.getValue() instanceof Integer)) {
-            throw new JobParametersInvalidException("Year is missing.");
+            throw new JobParametersInvalidException("Year is missing or is incorrectly formatted. Requires Integer.");
         }
 
         if (monthParameter == null || !(monthParameter.getValue() instanceof Integer)) {
-            throw new JobParametersInvalidException("Month is missing.");
+            throw new JobParametersInvalidException("Month is missing or is incorrectly formatted. Requires Integer.");
         }        
     }
     
