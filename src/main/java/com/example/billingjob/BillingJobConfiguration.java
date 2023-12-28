@@ -27,7 +27,7 @@ public class BillingJobConfiguration {
         return new JobBuilder("BillingJob", jobRepository)
                 .validator(billingJobParametersValidator())
                 .start(step1)
-                .start(step2)
+                .next(step2)
                 .build();
     }
 
