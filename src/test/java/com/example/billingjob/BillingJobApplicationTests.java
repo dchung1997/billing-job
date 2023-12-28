@@ -68,7 +68,9 @@ class BillingJobApplicationTests {
 	void testEmptyInputFile() throws Exception {
 		// Given
 		JobParameters jobParameters = new JobParametersBuilder()
-										.addString("input.file", "")
+										.addString("output.file", "staging/billing-report-2023-01.csv")
+										.addJobParameter("data.year", 2023, Integer.class)
+										.addJobParameter("data.month", 1, Integer.class)											
 										.toJobParameters();
 
 		// When		
@@ -78,6 +80,57 @@ class BillingJobApplicationTests {
 		Assertions.assertEquals("Input File is missing.", exception.getMessage());
 
 	}
+
+	@Test 
+	void testEmptyOutputFile() throws Exception {
+		// Given
+		JobParameters jobParameters = new JobParametersBuilder()
+										.addString("input.file", "input/billing-2023-01.csv")
+										.addJobParameter("data.year", 2023, Integer.class)
+										.addJobParameter("data.month", 1, Integer.class)											
+										.toJobParameters();
+
+		// When		
+		Throwable exception = Assertions.assertThrows(JobParametersInvalidException.class, () -> this.jobLauncherTestUtils.launchJob(jobParameters));
+		
+		// Then
+		Assertions.assertEquals("Output File is missing.", exception.getMessage());
+
+	}
+
+	@Test 
+	void testEmptyDataYear() throws Exception {
+		// Given
+		JobParameters jobParameters = new JobParametersBuilder()
+										.addString("input.file", "input/billing-2023-01.csv")
+										.addString("output.file", "staging/billing-report-2023-01.csv")
+										.addJobParameter("data.month", 1, Integer.class)											
+										.toJobParameters();
+
+		// When		
+		Throwable exception = Assertions.assertThrows(JobParametersInvalidException.class, () -> this.jobLauncherTestUtils.launchJob(jobParameters));
+		
+		// Then
+		Assertions.assertEquals("Year is missing.", exception.getMessage());
+
+	}	
+
+	@Test 
+	void testEmptyDataMonth() throws Exception {
+		// Given
+		JobParameters jobParameters = new JobParametersBuilder()
+										.addString("input.file", "input/billing-2023-01.csv")
+										.addString("output.file", "staging/billing-report-2023-01.csv")
+										.addJobParameter("data.year", 12, Integer.class)											
+										.toJobParameters();
+
+		// When		
+		Throwable exception = Assertions.assertThrows(JobParametersInvalidException.class, () -> this.jobLauncherTestUtils.launchJob(jobParameters));
+		
+		// Then
+		Assertions.assertEquals("Month is missing.", exception.getMessage());
+
+	}		
 
 	@Test
 	void contextLoads() {
