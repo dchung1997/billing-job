@@ -47,7 +47,8 @@ public class BillingJobConfiguration {
     }
 
     @Bean 
-    public Step step2(JobRepository jobRepository, JdbcTransactionManager transactionManager, ItemReader<BillingData> billingDataFileReader, ItemWriter<BillingData> billingDataTableWriter, BillingDataSkipListener skipListener) {
+    public Step step2(JobRepository jobRepository, JdbcTransactionManager transactionManager, 
+                        ItemReader<BillingData> billingDataFileReader, ItemWriter<BillingData> billingDataTableWriter, BillingDataSkipListener skipListener) {
         return new StepBuilder("fileIngesting", jobRepository)
                 .<BillingData,BillingData>chunk(100, transactionManager)
                 .reader(billingDataFileReader)
@@ -62,12 +63,16 @@ public class BillingJobConfiguration {
     @Bean
     public Step step3(JobRepository jobRepository, JdbcTransactionManager transactionManager, 
                         ItemReader<BillingData> billingDataTableReader, ItemProcessor<BillingData, 
-                        ReportingData> billingItemProcessor, ItemWriter<ReportingData> billingDataFileWriter) {
+                        ReportingData> billingItemProcessor, ItemWriter<ReportingData> billingDataFileWriter, BillingDataRetryListener retryListener) {
         return new StepBuilder("reportGeneration", jobRepository)
                 .<BillingData, ReportingData>chunk(100, transactionManager)
                 .reader(billingDataTableReader)
                 .processor(billingItemProcessor)
                 .writer(billingDataFileWriter)
+                .faultTolerant()
+                .retry(PricingException.class)
+                .retryLimit(100)
+                .listener(retryListener)
                 .build();
 
     }
@@ -114,8 +119,8 @@ public class BillingJobConfiguration {
     }
 
     @Bean 
-    public BillingDataProcessor billingDataProcessor() {
-        return new BillingDataProcessor();
+    public BillingDataProcessor billingDataProcessor(PricingService pricingService) {
+        return new BillingDataProcessor(pricingService);
     }
 
     @Bean
@@ -133,6 +138,16 @@ public class BillingJobConfiguration {
     @StepScope
     public BillingDataSkipListener skipListener(@Value("#{jobParameters['skip.file']}") String skippedFile) {
         return new BillingDataSkipListener(skippedFile);
+    }
+
+    @Bean
+    public BillingDataRetryListener retryListener() {
+        return new BillingDataRetryListener();
+    }
+
+    @Bean
+    public PricingService pricingService() {
+        return new PricingService();
     }
 }
 
