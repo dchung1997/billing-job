@@ -141,11 +141,6 @@ public class BillingJobConfiguration {
     }
 
     @Bean
-    public BillingDataRetryListener retryListener() {
-        return new BillingDataRetryListener();
-    }
-
-    @Bean
     public PricingService pricingService() {
         return new PricingService();
     }
