@@ -22,9 +22,9 @@ public class PricingService {
 
     public float getDataPricing() {
         // Used to simulate random failures of services.
-        if (this.random.nextInt(1000) % 7 == 0) {
-            throw new PricingException("Error while retrieving data pricing");
-        }
+        // if (this.random.nextInt(1000) % 7 == 0) {
+        //     throw new PricingException("Error while retrieving data pricing");
+        // }
 
         return this.dataPricing;
     }

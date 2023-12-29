@@ -65,6 +65,34 @@ class BillingJobApplicationTests {
 	}
 
 	@Test 
+	void testJobExecutionSkippedTests() throws Exception {
+		// Given
+		JobParameters jobParameters = new JobParametersBuilder()
+										.addString("input.file", "input/billing-2023-03.csv")
+										.addString("output.file", "staging/billing-report-2023-03.csv")
+										.addString("skip.file", "staging/billing-data-skip-2023-03.psv")
+										.addJobParameter("data.year", 2023, Integer.class)
+										.addJobParameter("data.month", 3, Integer.class)										
+										.toJobParameters();
+
+		// When
+		JobExecution jobExecution = this.jobLauncherTestUtils.launchJob(jobParameters);
+
+		// Then
+		Assertions.assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
+		Assertions.assertTrue(Files.exists(Paths.get("staging", "billing-2023-03.csv")));
+		Assertions.assertEquals(498, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BILLING_DATA"));
+
+		Path billingSkippedData = Paths.get("staging", "billing-data-skip-2023-03.psv");
+		Assertions.assertTrue(Files.exists(billingSkippedData));
+		Assertions.assertEquals(2, Files.lines(billingSkippedData).count());		
+		
+		Path billingReport = Paths.get("staging", "billing-report-2023-03.csv");
+		Assertions.assertTrue(Files.exists(billingReport));
+		Assertions.assertEquals(387, Files.lines(billingReport).count());
+	}
+	
+	@Test 
 	void testEmptyInputFile() throws Exception {
 		// Given
 		JobParameters jobParameters = new JobParametersBuilder()
